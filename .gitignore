@@ -1,0 +1,27 @@
+# Add the patterns you want to ignore:
+
+# Ignore all PDF files
+*.pdf
+
+# Ignore all TXT files
+#.txt
+
+# Ignore all CSV files
+# .csv
+
+# Ignore common Python environment folders
+.venv/
+__pycache__/
+venv/
+
+# Ignore the environment variable file if you created one
+.env
+
+# Ignore 
+#tmp/
+
+# Ignore *.md files
+# *.md
+
+# Ignore .DS_Store files (macOS specific)
+.DS_Store
