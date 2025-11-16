@@ -4,6 +4,12 @@
 # Core PDF library for reading, writing, and manipulating PDFs
 pypdf>=4.0.0
 
+# PDF table and image extraction with document layout analysis
+pdfplumber>=0.10.0
+
+# Image processing and format conversion
+Pillow>=10.0.0
+
 # Optional: Alternative high-performance PDF library
 # Uncomment if you want to use PyMuPDF instead
 # PyMuPDF>=1.23.0

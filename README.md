@@ -14,6 +14,8 @@ pip install -r requirements.txt
 
 The `requirements.txt` file contains:
 - **pypdf** (>=4.0.0) - Core library for PDF reading, writing, and manipulation
+- **pdfplumber** (>=0.10.0) - PDF table and image extraction with document layout analysis
+- **Pillow** (>=10.0.0) - Image processing and format conversion
 
 ### System Requirements
 
@@ -31,8 +33,6 @@ source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 ```
-
----
 
 ## Scripts
 
@@ -165,6 +165,114 @@ python pdf_merge.py -o combined.pdf -s doc1.pdf doc2.pdf doc3.pdf doc4.pdf
 python pdf_merge.py -o report.pdf -s cover.pdf content.pdf appendix.pdf
 ```
 Creates `report.pdf` containing all three files merged in order.
+
+---
+
+### 5. pdf_extract_table.py
+
+Extracts tables from PDF files and outputs to TXT or HTML format.
+
+**Description:**
+Uses document layout analysis to identify and extract only tables from PDF files. Ignores all other content types. Each table is labeled with its page number.
+
+**Arguments:**
+- `-t` or `-txt` - Output in plain text format (mandatory)
+- `-h` or `-html` - Output in HTML format (mandatory)
+- `<pdf_file>` - Source PDF file (mandatory)
+
+**Naming Convention:**
+- Text output: `[source_name]_tables.txt`
+- HTML output: `[source_name]_tables.html`
+
+**Usage:**
+
+```bash
+# Extract to text format
+python pdf_extract_table.py -t sample_file.pdf
+python pdf_extract_table.py -txt sample_file.pdf
+
+# Extract to HTML format
+python pdf_extract_table.py -h sample_file.pdf
+python pdf_extract_table.py -html sample_file.pdf
+```
+
+**Output:**
+- Text format: Tables formatted with column alignment and separators
+- HTML format: Styled HTML tables with alternating row colors
+
+**Example:**
+```bash
+python pdf_extract_table.py -h report.pdf
+```
+Creates `report_tables.html` containing all tables found in the PDF.
+
+---
+
+### 6. pdf_extract_image.py
+
+Extracts images from PDF files and saves to PNG or JPEG format with automatic duplicate detection.
+
+**Description:**
+Uses document layout analysis to identify and extract only images from PDF files. Automatically detects duplicate images across pages using SHA256 hash comparison and saves only unique instances. Images appearing on multiple pages are marked with `_multi` suffix.
+
+**Arguments:**
+- `-p` or `-png` - Output in PNG format (mandatory)
+- `-j` or `-jpeg` - Output in JPEG format (mandatory)
+- `<pdf_file>` - Source PDF file (mandatory)
+
+**Naming Convention:**
+- Single page image: `[source]_page_[NN]_image_[NN].[format]`
+- Multi-page image: `[source]_page_[NN]_image_[NN]_multi.[format]`
+- Page and image numbers use zero-padding (01, 02, etc.)
+- Page number refers to the first occurrence of the image
+
+**Usage:**
+
+```bash
+# Extract to PNG format
+python pdf_extract_image.py -p sample_file.pdf
+python pdf_extract_image.py -png sample_file.pdf
+
+# Extract to JPEG format
+python pdf_extract_image.py -j sample_file.pdf
+python pdf_extract_image.py -jpeg sample_file.pdf
+```
+
+**Output Examples:**
+- `sample_file_page_01_image_01.png` (unique image on page 1)
+- `sample_file_page_01_image_02_multi.png` (image appears on pages 1, 2, 3)
+- `sample_file_page_03_image_01.jpeg` (unique image on page 3)
+
+**Features:**
+- Extracts at 300 DPI resolution
+- Automatic duplicate detection across all pages
+- Reports which pages contain duplicate images
+- Handles RGBA to RGB conversion for JPEG format
+- Displays summary statistics (total, unique, duplicates)
+- Preserves image quality
+
+**Example:**
+```bash
+python pdf_extract_image.py -p report.pdf
+```
+Output:
+```
+Processing 10 page(s)...
+Found 3 image(s) on page 1
+Found 2 image(s) on page 5
+  Image 1 on page 5 is a duplicate (first seen on page 1)
+
+Saving unique images...
+  Saved: report_page_01_image_01_multi.png (appears on pages: 1, 5)
+  Saved: report_page_01_image_02.png
+  Saved: report_page_01_image_03.png
+  Saved: report_page_05_image_02.png
+
+Summary:
+  Total images found: 5
+  Unique images saved: 4
+  Duplicate images skipped: 1
+```
 
 ---
 

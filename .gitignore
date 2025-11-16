@@ -3,11 +3,10 @@
 # Ignore all PDF files
 *.pdf
 
-# Ignore all TXT files
-#.txt
-
-# Ignore all CSV files
-# .csv
+# Ignore all CSV,HTML,PNG files
+.csv
+.html
+.png
 
 # Ignore common Python environment folders
 .venv/
@@ -19,6 +18,7 @@ venv/
 
 # Ignore 
 #tmp/
+
 
 # Ignore *.md files
 # *.md
