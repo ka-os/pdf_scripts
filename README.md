@@ -16,6 +16,7 @@ The `requirements.txt` file contains:
 - **pypdf** (>=4.0.0) - Core library for PDF reading, writing, and manipulation
 - **pdfplumber** (>=0.10.0) - PDF table and image extraction with document layout analysis
 - **Pillow** (>=10.0.0) - Image processing and format conversion
+- **PyMuPDF** (>=1.23.0) - High-performance PDF library for robust font extraction and analysis (highly recommended for pdf_internals.py)
 
 ### System Requirements
 
@@ -273,6 +274,127 @@ Summary:
   Unique images saved: 4
   Duplicate images skipped: 1
 ```
+
+---
+
+### 7. pdf_internals.py
+
+Analyzes internal PDF structure and extracts detailed information about all elements and objects.
+
+**Description:**
+Comprehensive PDF analysis tool that examines fonts, images, tables, text content, annotations, form fields, and compression methods. Uses multiple detection methods for robust font extraction, including PyMuPDF for handling malformed PDFs.
+
+**Arguments:**
+- `<pdf_file>` - Source PDF file (mandatory)
+
+**Features:**
+- **Multi-method font detection**: Tries PyMuPDF, direct dictionary access, and content stream parsing
+- **Detailed font information**: Base font, subtype, encoding, embedded status
+- **Error resilience**: Continues analysis even with corrupted or malformed PDFs
+- **Comprehensive reporting**: Page-by-page breakdown with error tracking
+- **Summary statistics**: Total counts and error summary
+
+**Usage:**
+
+```bash
+python pdf_internals.py sample_file.pdf
+```
+
+**Output Sections:**
+
+1. **Document Information** - Pages, PDF version, encryption status, metadata
+2. **Fonts** - Font names, types, encodings, pages where used
+3. **Images** - Image dimensions and locations
+4. **Tables** - Table dimensions and locations
+5. **Text Content** - Character count and text-containing pages
+6. **Annotations** - Comment, highlight, and markup types
+7. **Form Fields** - Interactive form field types
+8. **Compression Methods** - Filters used (FlateDecode, DCTDecode, etc.)
+9. **Summary** - Aggregate statistics and error count
+
+**Example Output:**
+
+```
+======================================================================
+PDF INTERNALS ANALYSIS: document.pdf
+======================================================================
+
+Document Information:
+  Total Pages: 17
+  PDF Version: %PDF-1.7
+  Encrypted: No
+  Title: Sample Document
+
+----------------------------------------------------------------------
+
+1. FONTS
+======================================================================
+  Detection method: PyMuPDF
+  • Helvetica (Type1) - WinAnsiEncoding
+    Pages: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ... (15 pages total)
+  • Arial-BoldMT (TrueType) [Embedded]
+    Pages: 1, 3, 5
+  Total unique fonts: 2
+
+2. IMAGES
+======================================================================
+  • Size: 1920x1080px - Count: 3
+    Pages: 1, 5, 10
+  Total images: 3
+
+[... continues with other sections ...]
+
+SUMMARY
+======================================================================
+  Pages: 17
+  Fonts: 2
+  Images: 3
+  Tables: 1
+  Text Pages: 17
+  Annotations: 0
+  Form Fields: 0
+  Compression Methods: 2
+```
+
+**Font Detection Methods:**
+
+The script tries three methods in order:
+
+1. **PyMuPDF (Recommended)** - Most reliable, handles malformed PDFs
+   - Install: `pip install PyMuPDF`
+   - Extracts embedded font information
+   - Works with damaged or non-standard PDFs
+
+2. **Direct Dictionary Access** - Fallback for standard PDFs
+   - Accesses `/Resources/Font` directly
+   - Reads font descriptors
+   
+3. **Content Stream Parsing** - Last resort
+   - Parses content streams for `Tf` operators
+   - Matches font references to resources
+
+**Handling Errors:**
+
+The script gracefully handles:
+- Missing or corrupted font information
+- Broken object references
+- Malformed page structures
+- Incomplete metadata
+- Damaged compression streams
+
+Errors are reported but don't stop analysis. Each section shows:
+- Successfully extracted data
+- Error count and sample error messages
+- Summary of what couldn't be analyzed
+
+**Installation Note:**
+
+For best results with problematic PDFs, install PyMuPDF:
+```bash
+pip install PyMuPDF
+```
+
+Without PyMuPDF, the script uses fallback methods but may miss fonts in malformed PDFs.
 
 ---
 

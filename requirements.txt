@@ -10,6 +10,10 @@ pdfplumber>=0.10.0
 # Image processing and format conversion
 Pillow>=10.0.0
 
-# Optional: Alternative high-performance PDF library
-# Uncomment if you want to use PyMuPDF instead
-# PyMuPDF>=1.23.0
+# High-performance PDF library for robust font extraction and analysis
+# Highly recommended for pdf_internals.py
+PyMuPDF>=1.23.0
+
+# Optional: Alternative usage
+# Uncomment if you prefer different versions
+# PyMuPDF>=1.24.0
