@@ -1,0 +1,9 @@
+# PDF Processing Requirements
+# Install with: pip install -r requirements.txt
+
+# Core PDF library for reading, writing, and manipulating PDFs
+pypdf>=4.0.0
+
+# Optional: Alternative high-performance PDF library
+# Uncomment if you want to use PyMuPDF instead
+# PyMuPDF>=1.23.0
