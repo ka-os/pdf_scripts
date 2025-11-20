@@ -17,11 +17,13 @@ The `requirements.txt` file contains:
 - **pdfplumber** (>=0.10.0) - PDF table and image extraction with document layout analysis
 - **Pillow** (>=10.0.0) - Image processing and format conversion
 - **PyMuPDF** (>=1.23.0) - High-performance PDF library for robust font extraction and analysis (highly recommended for pdf_internals.py)
+- **pytesseract** (>=0.3.10) - OCR library for image-to-text extraction (used in img_ocr_text.py)
 
 ### System Requirements
 
 - Python 3.7 or higher
 - pip (Python package installer)
+- **Tesseract-OCR Engine** - Required for `img_ocr_text.py`. See installation instructions for your OS.
 
 ### Recommended Setup
 
@@ -473,6 +475,51 @@ Processing 10 page(s)...
 Text extracted successfully!
 Output saved to: report.txt
 ```
+
+---
+
+### 9. img_ocr_text.py
+
+Extracts text from image files using Optical Character Recognition (OCR) and saves it to a text file.
+
+**Description:**
+Reads image files (PNG, JPG/JPEG) and extracts any text discovered within them. The output is saved to a corresponding `.txt` file for each image, with empty lines removed. This script requires that you install the Tesseract-OCR engine on your system.
+
+**Arguments:**
+- `<source_files>` - One or more source image files (e.g., `file1.png file2.jpg`).
+- `<text_file_list>` - A single `.txt` file containing a list of image file paths to process (one path per line).
+- `-d` or `--dir <directory>` - Path to a directory containing image files to process.
+- `-p` or `--png` - When used with `-d`, process only PNG files.
+- `-j` or `--jpg` - When used with `-d`, process only JPG/JPEG files.
+
+**Notes:**
+- If `-p` or `-j` are not specified with `-d`, the script processes both PNG and JPG files.
+- The script requires Google's Tesseract OCR engine to be installed on the system.
+
+**Naming Convention:**
+- Output file: `[source_image_name].txt`
+
+**Usage:**
+
+```bash
+# Process individual image files
+python img_ocr_text.py document.png photo.jpg
+
+# Process a list of files from a .txt file
+python img_ocr_text.py list_of_images.txt
+
+# Process all images in a directory
+python img_ocr_text.py -d ./my_images
+
+# Process only PNG files in a directory
+python img_ocr_text.py -d ./my_images -p
+```
+
+**Example:**
+```bash
+python img_ocr_text.py scan.png
+```
+Creates `scan.txt` containing the text extracted from `scan.png`.
 
 ---
 

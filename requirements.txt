@@ -14,6 +14,9 @@ Pillow>=10.0.0
 # Highly recommended for pdf_internals.py
 PyMuPDF>=1.23.0
 
+# OCR library for image-to-text extraction
+pytesseract>=0.3.10
+
 # Optional: Alternative usage
 # Uncomment if you prefer different versions
 # PyMuPDF>=1.24.0
