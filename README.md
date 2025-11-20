@@ -398,6 +398,84 @@ Without PyMuPDF, the script uses fallback methods but may miss fonts in malforme
 
 ---
 
+### 8. pdf_extract_text.py
+
+Extracts all text and table content from PDF files to TXT format.
+
+**Description:**
+Comprehensive text extraction tool that extracts both regular text and formatted tables from PDF files using document layout analysis. Preserves document structure with page markers and formatted tables.
+
+**Arguments:**
+- `<pdf_file>` - Source PDF file (mandatory)
+
+**Naming Convention:**
+- Output file: `[source_name].txt`
+
+**Usage:**
+
+```bash
+python pdf_extract_text.py sample_file.pdf
+python pdf_extract_text.py document.pdf
+```
+
+**Output Format:**
+
+The TXT file includes:
+- **Page headers** - Clear page number markers
+- **Text content** - All extracted text from each page
+- **Formatted tables** - Tables with column alignment and separators
+- **Error markers** - Notation where extraction failed
+
+**Example Output:**
+
+```
+======================================================================
+PAGE 1
+======================================================================
+
+This is the text content from the first page of the PDF document.
+It includes all paragraphs and text elements.
+
+----------------------------------------------------------------------
+TABLE 1 (Page 1)
+----------------------------------------------------------------------
+Name      | Age  | City        
+John Doe  | 30   | New York    
+Jane Smith| 25   | Los Angeles 
+
+======================================================================
+PAGE 2
+======================================================================
+
+Text content from page 2...
+```
+
+**Features:**
+- Preserves page structure and order
+- Formats tables with column alignment
+- Handles multi-page documents
+- Uses document layout analysis for accurate extraction
+- Error handling with descriptive messages
+- Automatic UTF-8 encoding for international characters
+
+**Example:**
+```bash
+python pdf_extract_text.py report.pdf
+```
+Output:
+```
+Processing 10 page(s)...
+  Extracting page 1...
+  Extracting page 2...
+  ...
+  Extracting page 10...
+
+Text extracted successfully!
+Output saved to: report.txt
+```
+
+---
+
 ## License
 
 MIT License
