@@ -4,9 +4,9 @@
 *.pdf
 
 # Ignore all CSV,HTML,PNG files
-.csv
-.html
-.png
+*.csv
+*.html
+*.png
 
 # Ignore common Python environment folders
 .venv/
@@ -14,7 +14,7 @@ __pycache__/
 venv/
 
 # Ignore the environment variable file if you created one
-.env
+*.env
 
 # Ignore 
 #tmp/
@@ -27,4 +27,4 @@ venv/
 .DS_Store
 
 # Ignore bash files
-.sh
+*.sh
