@@ -1,9 +1,9 @@
-
 import os
 import sys
 import argparse
 from PIL import Image
 import pytesseract
+from fpdf import FPDF
 
 def perform_ocr(image_path):
     """
@@ -18,6 +18,36 @@ def perform_ocr(image_path):
     except Exception as e:
         print(f"Error processing image '{image_path}': {e}", file=sys.stderr)
     return None
+
+def save_as_pdf(text, output_path):
+    """
+    Saves the extracted text as a searchable PDF.
+    """
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        # Add a Unicode font (DejaVu) to support a wide range of characters
+        pdf.add_font("DejaVu", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+        pdf.set_font("DejaVu", "", 12)
+        pdf.multi_cell(0, 5, text)
+        pdf.output(output_path)
+        print(f"  -> Successfully saved PDF to '{output_path}'")
+    except Exception as e:
+        # Fallback for systems without DejaVu font installed
+        if "FPDF error: Can't open font file" in str(e):
+            try:
+                print("  -> DejaVu font not found. Falling back to Arial (may not support all characters).")
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                pdf.multi_cell(0, 5, text)
+                pdf.output(output_path)
+                print(f"  -> Successfully saved PDF to '{output_path}'")
+            except Exception as fallback_e:
+                print(f"  -> Error creating PDF with fallback font: {fallback_e}", file=sys.stderr)
+        else:
+            print(f"  -> Error creating PDF: {e}", file=sys.stderr)
+
 
 def get_files_from_directory(dir_path, process_png, process_jpg):
     """
@@ -34,7 +64,6 @@ def get_files_from_directory(dir_path, process_png, process_jpg):
         supported_extensions.append('.jpg')
         supported_extensions.append('.jpeg')
     
-    # If no format is specified, process both
     if not supported_extensions:
         supported_extensions.extend(['.png', '.jpg', '.jpeg'])
 
@@ -49,34 +78,49 @@ def main():
     Main function to parse arguments and orchestrate the OCR process.
     """
     parser = argparse.ArgumentParser(
-        description="Extract text from images using OCR.",
-        epilog="""Examples:
-               python img_ocr_text.py file1.png file2.jpg
-               python img_ocr_text.py files_to_read.txt
-               python img_ocr_text.py -d ./images_folder
-               python img_ocr_text.py -d ./images -p  (only PNGs)
-               python img_ocr_text.py -d ./images -j  (only JPGs)""",
+        description="Extract text from images using OCR and save as .txt or searchable .pdf.",
+        epilog="Examples:\n"
+               "  python img_ocr_text.py -t file1.png file2.jpg\n"
+               "  python img_ocr_text.py -p files_to_read.txt\n"
+               "  python img_ocr_text.py -p -d ./images_folder\n",
         formatter_class=argparse.RawTextHelpFormatter
     )
+
+    # Mandatory output format group
+    output_format_group = parser.add_mutually_exclusive_group(required=True)
+    output_format_group.add_argument(
+        '-t', '--text',
+        action='store_true',
+        help="Output extracted text to a .txt file."
+    )
+    output_format_group.add_argument(
+        '-p', '--pdf',
+        action='store_true',
+        help="Output extracted text to a searchable .pdf file."
+    )
+
+    # Input sources
     parser.add_argument(
         '-d', '--dir',
         dest='directory',
         help="Path to a directory with image files to process."
     )
     parser.add_argument(
-        '-p', '--png',
+        'inputs',
+        nargs='*',
+        help="One or more image files, or a single .txt file listing image files."
+    )
+    
+    # Filters for directory mode
+    parser.add_argument(
+        '--png',
         action='store_true',
         help="Process only PNG files when using -d."
     )
     parser.add_argument(
-        '-j', '--jpg',
+        '--jpg',
         action='store_true',
         help="Process only JPG/JPEG files when using -d."
-    )
-    parser.add_argument(
-        'inputs',
-        nargs='*',
-        help="One or more image files, or a single .txt file listing image files."
     )
 
     args = parser.parse_args()
@@ -92,6 +136,7 @@ def main():
 
     files_to_process = []
     if args.directory:
+        # Note: The original -p and -j flags are now --png and --jpg to avoid conflict
         files_to_process = get_files_from_directory(args.directory, args.png, args.jpg)
     elif args.inputs:
         first_input = args.inputs[0]
@@ -116,18 +161,23 @@ def main():
         text = perform_ocr(image_path)
 
         if text is not None:
-            # Filter out empty lines
             filtered_lines = [line for line in text.splitlines() if line.strip()]
             filtered_text = "\n".join(filtered_lines)
-
+            
             base, _ = os.path.splitext(image_path)
-            output_path = base + '.txt'
-            try:
-                with open(output_path, 'w', encoding='utf-8') as f:
-                    f.write(filtered_text)
-                print(f"  -> Successfully saved text to '{output_path}'")
-            except Exception as e:
-                print(f"  -> Error writing to file '{output_path}': {e}", file=sys.stderr)
+
+            if args.text:
+                output_path = base + '.txt'
+                try:
+                    with open(output_path, 'w', encoding='utf-8') as f:
+                        f.write(filtered_text)
+                    print(f"  -> Successfully saved text to '{output_path}'")
+                except Exception as e:
+                    print(f"  -> Error writing to file '{output_path}': {e}", file=sys.stderr)
+            
+            elif args.pdf:
+                output_path = base + '.pdf'
+                save_as_pdf(filtered_text, output_path)
 
 if __name__ == "__main__":
     main()

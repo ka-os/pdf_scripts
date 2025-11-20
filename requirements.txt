@@ -17,6 +17,9 @@ PyMuPDF>=1.23.0
 # OCR library for image-to-text extraction
 pytesseract>=0.3.10
 
+# Library to create PDF documents from text
+fpdf2>=2.7.0
+
 # Optional: Alternative usage
 # Uncomment if you prefer different versions
 # PyMuPDF>=1.24.0
